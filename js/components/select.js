@@ -1,31 +1,35 @@
-var Select = React.createClass({
-    propTypes: {
-        types: React.PropTypes.array.isRequired,
-        emails: React.PropTypes.array.isRequired,
-        typeIndex: React.PropTypes.number.isRequired,
-        onChange: React.PropTypes.func.isRequired
-    },
+import React from "react";
 
-    handleOnChangeEvent: function (event) {
-        var selectedTypeIndex = event.target.selectedIndex;
-        this.props.onChange(selectedTypeIndex);
-    },
+class Select extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleOnChangeEvent = this.handleOnChangeEvent.bind(this);
+    }
 
-    render: function () {
-        var currentIndex = this.props.typeIndex;
+    handleOnChangeEvent(event) {
+        var selectedType = event.target.value;
+        this.props.onChange(selectedType);
+    }
+
+    render() {
         var types = this.props.types.map(function (type, index) {
-            var selected = index == currentIndex ? ' selected ' : '';
-            return <option value={type}>{type}</option>;
+            return <option value={type} key={index}>{type}</option>;
         });
 
         var emails = this.props.emails.join(' | ');
         return (
             <div>
-                <select onChange={this.handleOnChangeEvent}>{types}</select>
+                <select onChange={this.handleOnChangeEvent} value={this.props.selectedType}>{types}</select>
                 <div>{emails}</div>
             </div>);
     }
-});
+}
 
-//module.exports = Select;
-window.Select = Select;
+Select.propTypes = {
+    types: React.PropTypes.array.isRequired,
+    emails: React.PropTypes.array.isRequired,
+    selectedType: React.PropTypes.string.isRequired,
+    onChange: React.PropTypes.func.isRequired
+};
+
+module.exports = Select;

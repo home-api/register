@@ -1,55 +1,65 @@
-var request = new XMLHttpRequest();
-request.onload = onDataLoadedListener;
-request.open("get", "data.json", true);
-request.send();
+import React from "react";
+import ReactDOM from "react-dom";
+import Button from "./button";
+import Select from "./select";
 
-var data;
-function onDataLoadedListener() {
-    data = JSON.parse(this.responseText);
-    initializeComponent();
+fetch("data.json").then(function (response) {
+    response.json().then(function (content) {
+        onDataLoaded(content);
+    });
+});
+
+function onDataLoaded(content) {
+    initializeComponent(content);
 }
 
-function initializeComponent() {
-    var Button = React.createClass({
-        getInitialState: function () {
-            return {
-                data: this.props.data.events.map(function (event) {
-                    return event;
-                }),
-                typeIndex: 0,
-            }
-        },
+function initializeComponent(data) {
+    class Main extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                data: props.data.events.reduce(function (object, event) {
+                    object[event.type.toString()] = event.emails;
+                    return object;
+                }, {}),
+                selectedType: 'Football'
+            };
 
-        updateCurrentType: function (typeIndex) {
-            this.setState({typeIndex: typeIndex});
-        },
+            this.clickHandler = this.clickHandler.bind(this);
+            this.updateCurrentType = this.updateCurrentType.bind(this);
+        }
 
-        clickHandler: function (email) {
-            this.state.data[this.state.typeIndex].emails.push(email);
+        updateCurrentType(selectedType) {
+            this.setState({selectedType: selectedType});
+        }
+
+        clickHandler(email) {
+            this.state.data[this.state.selectedType].emails.push(email);
             this.setState({data: this.state.data});
-            // data has to be save to the file bun doesn't have access to the file system
-        },
+        }
 
-        render: function () {
+        render() {
             var eventsList = [];
-            this.state.data.map(function (event) {
-                eventsList.push(event.type);
-            });
+            for (var type in this.state.data) {
+                if (this.state.data.hasOwnProperty(type)) {
+                    eventsList.push(type);
+                }
+            }
 
-            var registeredUsers = this.state.data[this.state.typeIndex].emails;
+            var registeredUsers = this.state.data[this.state.selectedType];
 
             return (
                 <form name="register">
-                    <window.Select
+                    <Select
                         types={eventsList}
                         emails={registeredUsers}
-                        typeIndex={this.state.typeIndex}
+                        selectedType={this.state.selectedType}
                         onChange={this.updateCurrentType}/>
-                    <window.Button onClick={this.clickHandler}/>
+                    <Button onClick={this.clickHandler}/>
                 </form>
             );
         }
-    });
+    }
 
-    ReactDOM.render(<Button data={data}/>, document.getElementById('app'));
+    ReactDOM.render(<Main data={data}/>, document.getElementById('app'));
 }
