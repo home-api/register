@@ -1,22 +1,26 @@
-var Button = React.createClass({
-    propTypes: {
-        onClick: React.PropTypes.func.isRequired
-    },
+import React from "react";
 
-    handleOnClickEvent: function (event) {
-        var email = document.getElementById('user-email').value;
-        console.log(email);
+class Button extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleOnClickEvent = this.handleOnClickEvent.bind(this);
+    }
+
+    handleOnClickEvent(event) {
+        var email = this.refs.input.value;
         this.props.onClick(email);
-    },
+    }
 
-    render: function () {
+    render() {
         return (
             <div>
-                <div><input type="text" id="user-email"/></div>
+                <div><input type="text" id="user-email" ref="input"/></div>
                 <button onClick={this.handleOnClickEvent} form="register">Register for event</button>
             </div>
-        );
+        )
     }
-});
+}
 
-window.Button = Button;
+Button.propTypes = {onClick: React.PropTypes.func.isRequired};
+
+module.exports = Button;
