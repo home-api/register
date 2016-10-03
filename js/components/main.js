@@ -34,7 +34,7 @@ function initializeComponent(data) {
         }
 
         clickHandler(email) {
-            this.state.data[this.state.selectedType].emails.push(email);
+            this.state.data[this.state.selectedType].push(email);
             this.setState({data: this.state.data});
         }
 
